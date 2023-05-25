@@ -3,6 +3,7 @@ const mongoose = require('mongoose')
 
 const app = express();
 const userRoutes = require('./routes/user')
+app.use(express.json())
 
 //Mongoose connect 
 
@@ -20,27 +21,6 @@ app.use((req, res, next) => {
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
     next();
   });
-
-//User model
-
-const userSchema = new mongoose.Schema({
-  email: String,
-  password: String
-})
-const User = mongoose.model('User', userSchema)
-
-//Post api/auth/signup
-
-app.use(express.json())
-
-app.post('/api/auth/signup',(req, res, next) => {
-  const email = req.body.email
-  const password = req.body.password
-  const newUser = new User({email:email, password:password})
-  newUser.save()
-  .then(() => {res.status(201).json({message: 'Utilisateur créé !'})})
-  .catch((error => {res.status(400).json({  error })}))
-})
 
 app.use('/api/auth', userRoutes)
 
