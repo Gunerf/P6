@@ -2,6 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose')
 
 const app = express();
+const userRoutes = require('./routes/user')
 
 //Mongoose connect 
 
@@ -40,5 +41,7 @@ app.post('/api/auth/signup',(req, res, next) => {
   .then(() => {res.status(201).json({message: 'Utilisateur créé !'})})
   .catch((error => {res.status(400).json({  error })}))
 })
+
+app.use('/api/auth', userRoutes)
 
 module.exports = app;
