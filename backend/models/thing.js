@@ -10,8 +10,8 @@ const thingSchema = mongoose.Schema({
     heat : Number,
     likes : Number,
     dislikes : Number,
-    usersLiked : String,
-    usersDisliked : String,
+    usersLiked: [ String ],
+    usersDisliked: [ String ],
 })
 
 module.exports = mongoose.model('Thing', thingSchema)
