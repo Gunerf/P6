@@ -19,7 +19,7 @@ mongoose.connect('mongodb+srv://schwerdtlenicolas:3O78FfcGfgXfXtDy@cluster0.lgc4
 
 app.use(cors())
 
-app.use('api/sauces', stuffRoutes)
+app.use('/api/sauces', stuffRoutes)
 app.use('/api/auth', userRoutes)
 
 

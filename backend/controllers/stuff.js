@@ -1,10 +1,14 @@
 const Thing = require('../models/thing')
 
 exports.createSauce = (req, res, next) => {
+    const sauceObjet = JSON.parse(req.body.sauce)
+    delete sauceObjet.userId
+    delete sauceObjet._id
     const thing = new Thing({
-      ...req.body.sauce
+      ...sauceObjet,
+      userId: req.auth.userId,
+      imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
     })
-    console.log(thing)
     thing.save()
     .then(() => res.status(201).json({message: 'Objet enregistré !'}))
     .catch(error => res.status(400).json({  error }))

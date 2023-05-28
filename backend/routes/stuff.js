@@ -9,6 +9,6 @@ const stuffCtrl = require('../controllers/stuff')
 
 router.post('/', auth, multer, stuffCtrl.createSauce)
 router.get('/:id', auth, stuffCtrl.getOneSauce);  
-router.get('/api/sauces', auth, stuffCtrl.getAllSauce);
+router.get('/', auth, stuffCtrl.getAllSauce);
 
   module.exports = router
