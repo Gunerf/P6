@@ -1,4 +1,5 @@
 const Thing = require('../models/thing')
+const fs = require('fs')
 
 exports.createSauce = (req, res, next) => {
     const sauceObjet = JSON.parse(req.body.sauce)
@@ -27,17 +28,27 @@ exports.getAllSauce = (req, res, next) => {
   }
 
 exports.modifySauce = (req, res, next) => {
-  console.log(req.params.id)
-  console.log(req.body)
   Thing.updateOne({_id: req.params.id}, {...req.body, _id: req.params.id})
   .then(() => res.status(200).json({message: 'Objet modifié !' }))
   .catch(error => res.status(400).json({ error }))
 }
 
 exports.deleteSauce = (req, res, next) => {
-  Thing.deleteOne({_id: req.params.id})
-  .then(() => res.status(200).json({message: 'Objet supprimé !'}))
-  .catch(error => res.status(400).json({ error }))
+  Thing.findOne({_id: req.params.id})
+  .then(thing => {
+    console.log(thing.userId)
+    console.log(req.auth.userId)
+    if(thing.userId != req.auth.userId){
+      res.status(400).json({message: 'Non-autorisé'})
+    }else{
+      const filename = thing.imageUrl.split('/images')[1]
+      fs.unlink(`images/${filename}`, () => {
+        Thing.deleteOne({_id: req.params.id})
+          .then(() => {res.status(200).json({message: 'Objet supprimé !'})})
+          .catch(error => res.status(400).json({ error }))
+      })
+    }
+  })
 }
 
 exports.likeSauce = (req, res ,next) => {
