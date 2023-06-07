@@ -39,3 +39,29 @@ exports.deleteSauce = (req, res, next) => {
   .then(() => res.status(200).json({message: 'Objet supprimé !'}))
   .catch(error => res.status(400).json({ error }))
 }
+
+exports.likeSauce = (req, res ,next) => {
+  Thing.findOne({_id: req.params.id})
+    .then((sauce) => {
+      const like = req.body.like
+      const userId = req.body.userId
+      if(like === 1){
+        if(!sauce.usersLiked.find(id => id ==userId)){
+          sauce.usersLiked.push(userId)
+        }
+      } else if(like === 0){
+        sauce.usersDisliked.filter(id => id !== userId)
+        sauce.usersLiked.filter(id => id !== userId)
+      } else if(like === -1){
+        if(!sauce.usersDisliked.find(id => id ==userId)){
+          sauce.usersDisliked.push(userId)
+        }
+      }
+      sauce.likes = sauce.usersLiked.length
+      sauce.dislikes = sauce.usersDisliked.length
+      sauce.save()
+    })
+  .then(() => res.status(201).json({message: 'Objet liké !'}))
+  .catch(error => res.status(400).json({ error }))
+}
+
