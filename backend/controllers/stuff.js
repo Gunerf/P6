@@ -61,8 +61,8 @@ exports.likeSauce = (req, res ,next) => {
           sauce.usersLiked.push(userId)
         }
       } else if(like === 0){
-        sauce.usersDisliked.filter(id => id !== userId)
-        sauce.usersLiked.filter(id => id !== userId)
+        sauce.usersDisliked = sauce.usersDisliked.filter(id => id != userId)
+        sauce.usersLiked = sauce.usersLiked.filter(id => id != userId)
       } else if(like === -1){
         if(!sauce.usersDisliked.find(id => id ==userId)){
           sauce.usersDisliked.push(userId)
@@ -70,6 +70,8 @@ exports.likeSauce = (req, res ,next) => {
       }
       sauce.likes = sauce.usersLiked.length
       sauce.dislikes = sauce.usersDisliked.length
+      console.log(like)
+      console.log(sauce)
       sauce.save()
     })
   .then(() => res.status(201).json({message: 'Objet liké !'}))
