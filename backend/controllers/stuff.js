@@ -27,17 +27,42 @@ exports.getAllSauce = (req, res, next) => {
       .catch(error => res.status(400).json({ error }));
   }
 
-exports.modifySauce = (req, res, next) => {
-  Thing.updateOne({_id: req.params.id}, {...req.body, _id: req.params.id})
-  .then(() => res.status(200).json({message: 'Objet modifié !' }))
-  .catch(error => res.status(400).json({ error }))
-}
+  exports.modifySauce = (req, res ,next) => {
+    if (req.file) {
+    Thing.findOne({ _id: req.params.id })
+      .then((sauce) => {
+        const filename = sauce.imageUrl.split('/images/')[1];
+        fs.unlink(`images/${filename}`, () => {
+            Thing.updateOne({ _id: req.params.id }, { 
+              name: req.body.sauce.name,
+              manufacturer: req.body.sauce.manufacturer,
+              description: req.body.sauce.description,
+              mainPepper: req.body.sauce.mainPepper,
+              heat: req.body.sauce.heat,
+              imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`,
+              _id: req.params.id 
+              }) 
+            .then(() => res.status(200).json({ message: 'Sauce et image modifiées' }))
+            .catch((error) => res.status(400).json({ error }));
+        });
+      })
+      .catch((error) => res.status(400).json({ error }));
+    } else {
+    Thing.updateOne({ _id: req.params.id }, {
+        name: req.body.name,
+        manufacturer: req.body.manufacturer,
+        description: req.body.description,
+        mainPepper: req.body.mainPepper,
+        heat: req.body.heat,
+        _id: req.params.id }) 
+      .then(() => res.status(200).json({ message: 'Sauce modifiée' }))
+    .catch((error) => res.status(400).json({ error }));
+    }
+    };
 
 exports.deleteSauce = (req, res, next) => {
   Thing.findOne({_id: req.params.id})
   .then(thing => {
-    console.log(thing.userId)
-    console.log(req.auth.userId)
     if(thing.userId != req.auth.userId){
       res.status(400).json({message: 'Non-autorisé'})
     }else{
@@ -55,7 +80,7 @@ exports.likeSauce = (req, res ,next) => {
   Thing.findOne({_id: req.params.id})
     .then((sauce) => {
       const like = req.body.like
-      const userId = req.body.userId
+      const userId = req.auth.userId
       if(like === 1){
         if(!sauce.usersLiked.find(id => id ==userId)){
           sauce.usersLiked.push(userId)
@@ -70,7 +95,6 @@ exports.likeSauce = (req, res ,next) => {
       }
       sauce.likes = sauce.usersLiked.length
       sauce.dislikes = sauce.usersDisliked.length
-      console.log(like)
       console.log(sauce)
       sauce.save()
     })
